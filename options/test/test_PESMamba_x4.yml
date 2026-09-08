@@ -1,0 +1,82 @@
+# general settings
+name: PESMamba_X4
+model_type: SRModel
+scale: 4
+num_gpu: auto
+manual_seed: 10
+
+datasets:
+  test_1:  # the 1st test dataset
+    name: AID_test
+    type: PairedImageDataset
+    dataroot_gt: /AID/test/HR
+    dataroot_lq: /AID/test/LR/x4
+    filename_tmpl: '{}_x4'
+    io_backend:
+      type: disk
+
+  test_2:  # the 2nd test dataset
+    name: UCMerced
+    type: PairedImageDataset
+    dataroot_gt: /UCMerced_LandUse/UCMerced_LandUse/test/HR
+    dataroot_lq: /UCMerced_LandUse/UCMerced_LandUse/test/LR/x4
+    filename_tmpl: '{}_x4'
+    io_backend:
+      type: disk
+# #
+#   test_3:  # the 3rd test dataset
+#     name: B100
+#     type: PairedImageDataset
+#     dataroot_gt: /SR/B100/HR
+#     dataroot_lq: /SR/B100/LR_bicubic/X2
+#     filename_tmpl: '{}x2'
+#     io_backend:
+#       type: disk
+
+#   test_4:  # the 4th test dataset
+#     name: Urban100
+#     type: PairedImageDataset
+#     dataroot_gt: /SR/Urban100/HR
+#     dataroot_lq: /SR/Urban100/LR_bicubic/X2
+#     filename_tmpl: '{}x2'
+#     io_backend:
+#       type: disk
+
+#   test_5:  # the 5th test dataset
+#     name: Manga109
+#     type: PairedImageDataset
+#     dataroot_gt: /SR/Manga109/HR
+#     dataroot_lq: /SR/Manga109/LR_bicubic/X2
+#     filename_tmpl: '{}_LRBI_x2'
+#     io_backend:
+#       type: disk
+
+
+network_g:
+  type: PESMamba
+  scale: 4
+  in_chans: 3
+  img_range: 1.
+  num_layers: 8
+  embedding_dim: 48
+  d_state: 16
+  K_list: [4, 4, 4, 4, 4, 4, 4, 4]
+# path
+path:
+  pretrain_network_g: /home/waas/MambaIR-main/experiments/PESMamba_X4/models/net_g_latest.pth
+  strict_load_g: true
+
+# validation settings
+val:
+  save_img: true
+  suffix: ~  # add suffix to saved images, if None, use exp name
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: true
+    ssim:
+      type: calculate_ssim
+      crop_border: 4
+      test_y_channel: true
